@@ -1,6 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
 import { Component } from 'react';
+import CardList from './components/card-list/card-list.component';
+import SearchBox from './components/search-box/search-box.component';
 
 class App extends Component {
 
@@ -12,6 +13,11 @@ class App extends Component {
         }
     }
 
+    onSearchChange = (event) => {
+        const searchString = event.target.value.toLowerCase();
+        this.setState({ searchString })
+    };
+
     componentDidMount() {
         fetch("https://jsonplaceholder.typicode.com/users")
             .then(response => response.json())
@@ -19,28 +25,22 @@ class App extends Component {
     }
 
     render() {
-        const filteredMonsters = this.state.monsters.filter(monster => {
-            return monster.name.toLowerCase().includes(this.state.searchString);
+        const { monsters, searchString } = this.state;
+        const { onSearchChange } = this;
+
+        const filteredMonsters = monsters.filter(monster => {
+            return monster.name.toLowerCase().includes(searchString);
         });
 
         return (
             <div className="App">
-                <input
-                    className='search-box'
-                    type='search'
-                    placeholder='search monsters'
-                    onChange={(event) => {
-                        const searchString = event.target.value.toLowerCase();
-                        this.setState({searchString})
-                    }}
+                <h1 className='app-title'>MONSTERS ROLODEX</h1>
+                <SearchBox 
+                    className={'search-box'}
+                    placeholder={'search monsters'}
+                    onSearchChangeHandler={onSearchChange} 
                 />
-                {filteredMonsters.map(monster => {
-                    return (
-                        <div key={monster.id}>
-                            <h1>{monster.name}</h1>
-                        </div>
-                    );
-                })}
+                <CardList monsters={filteredMonsters} />
             </div>
         );
     };
